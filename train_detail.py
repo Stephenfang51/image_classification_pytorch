@@ -2,6 +2,15 @@ import argparse
 import os
 import utils as util
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Unsupported value encountered.')
+
+
 class train_detail():
     def __init__(self):
         self._parser = argparse.ArgumentParser()
@@ -13,10 +22,10 @@ class train_detail():
 
         self._parser.add_argument('--train_path', type=str, help='train dataset path')
         self._parser.add_argument('--model', type=str, default = 'se_resnext50_32x4d', help='se_resnext50_32x4d || resnet18')
-        self._parser.add_argument('--checkpoint', type=str, default = 'se_resnext50_32x4d',  help='train dataset path')
+        self._parser.add_argument('--checkpoint', type=str,  help='your checkpoint model name')
         self._parser.add_argument('--loss', type=str, default = 'CrossEntropy', help='FocalLoss || CrossEntropy || LabelSmoothSoftmaxCE')
-        self._parser.add_argument('--freeze', type=bool, default = 'True', help='?')
-        self._parser.add_argument('--resume', type=bool, default = 'False', help='?')
+        self._parser.add_argument('--freeze', type=str2bool, default = True, help='freeze layer0~3 or not')
+        self._parser.add_argument('--resume', type=str2bool, default = False, help='if use checkpoint or not')
         self._parser.add_argument('--num_classes', type=int, default = '3', help='number of classes')
         self._parser.add_argument('--input_size', type=int, default = '224', help='size of input image')
         self._parser.add_argument('--batch_size', type=int, default = '256', help='batch to put in')
@@ -27,6 +36,7 @@ class train_detail():
         self._parser.add_argument('--total_epoch', type=int, default = '20', help='?')
         self._parser.add_argument('--alpha', type=float, default = '0.2', help='focal loss')
         self._parser.add_argument('--gamma', type=int, default = '5', help='focal loss')
+        self._parser.add_argument('--warm_up', type=str2bool, default = True, help='if warm up lr at first training')
 
     def parse(self):
         if not self._initialized:

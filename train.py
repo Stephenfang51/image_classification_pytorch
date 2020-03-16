@@ -31,6 +31,7 @@ Num_classes = train_opt.num_classes
 Size = train_opt.input_size
 Model = train_opt.model
 Checkpoint = train_opt.checkpoint
+Resume = train_opt.resume
 Loss = train_opt.loss
 Num_epochs = train_opt.num_epochs
 Batch_size = train_opt.batch_size
@@ -38,6 +39,7 @@ Freeze = train_opt.freeze
 Init_lr = train_opt.init_lr
 Multiplier = train_opt.multiplier
 Total_epoch = train_opt.total_epoch
+Grad_warm = train_opt.warm_up
 
 
 #focal loss
@@ -64,6 +66,7 @@ def train():
 
     # freeze layers
     if Freeze:
+        print('freeze the grad of layer0~layer3 now !')
         if Model == 'se_resnext50_32x4d':
             for p in model.backbone.layer0.parameters(): p.requires_grad = False
         for p in model.backbone.layer1.parameters(): p.requires_grad = False
@@ -87,8 +90,8 @@ def train():
     dataloader_train = DataLoader(dst_train, batch_size=Batch_size // 2, shuffle=True, num_workers=8)
 
     # -------load checkpoint -------------#
-    # if Resume:
-    #     model = t.load(os.path.join('./checkpoints', Checkpoint))
+    if Resume:
+        model = t.load(os.path.join('./checkpoints', Checkpoint))
 
     # train
     sum = 0
@@ -109,9 +112,15 @@ def train():
                               #                                   {'params':metric_fc.parameters()}
                               ], lr=Init_lr, betas=(0.9, 0.999), weight_decay=0.002)
     # --------scheduler ------------------#
-    scheduler_cosine = t.optim.lr_scheduler.CosineAnnealingLR(optimizer, Num_epochs)
-    scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=Multiplier, total_epoch=Total_epoch,
+
+    if Grad_warm:
+        scheduler_cosine = t.optim.lr_scheduler.CosineAnnealingLR(optimizer, Num_epochs)
+        scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=Multiplier, total_epoch=Total_epoch,
                                               after_scheduler=scheduler_cosine)
+
+
+
+
 
     print('Start training')
     # ------ list for plot curve ----------#
@@ -121,7 +130,8 @@ def train():
     lr_list = []
     # -------- train --------------------#
     for epoch in range(Num_epochs):
-        scheduler_warmup.step()
+        if Grad_warm:
+            scheduler_warmup.step()
 
         ep_start = time.time()
         model.train()
@@ -159,7 +169,7 @@ def train():
         # -----------以上归零-------------------#
         if (epoch + 1) % 50 == 0 and epoch < Num_epochs or (epoch + 1) == Num_epochs:
             print('saving model')
-            t.save(model, '{}.pth'.format(Checkpoint))
+            t.save(model, './checkpoint/{}.pth'.format(Checkpoint))
 
         # -------------计算钟头-----------------#
         if (time.time() - begin_time) / 60 / 60 > 8:  # 超过8小 中断
