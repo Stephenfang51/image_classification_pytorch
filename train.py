@@ -91,7 +91,7 @@ def train():
 
     # -------load checkpoint -------------#
     if Resume:
-        model = t.load(os.path.join('./checkpoints', Checkpoint))
+        model = t.load(os.path.join('./checkpoints/{}.pth'.format(Checkpoint)))
 
     # train
     sum = 0
@@ -168,8 +168,8 @@ def train():
         train_top1_sum = 0
         # -----------以上归零-------------------#
         if (epoch + 1) % 50 == 0 and epoch < Num_epochs or (epoch + 1) == Num_epochs:
-            print('saving model')
-            t.save(model, './checkpoint/{}.pth'.format(Checkpoint))
+            t.save(model, './checkpoints/{}.pth'.format(Checkpoint))
+            print('saving model successfully')
 
         # -------------计算钟头-----------------#
         if (time.time() - begin_time) / 60 / 60 > 8:  # 超过8小 中断
