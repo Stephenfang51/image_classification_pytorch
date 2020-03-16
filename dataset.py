@@ -5,7 +5,7 @@ from PIL import Image
 
 
 class CDCDataset(Dataset):
-    def __init__(self, dataset, transform=None, mode='train', tta=False, idx=0):
+    def __init__(self, dataset, transform=None, mode='train', test_path = None, tta=False, idx=0):
         self.tta=tta
         self.idx = idx
         self.mode = mode
@@ -17,7 +17,7 @@ class CDCDataset(Dataset):
             # print(self.ims, self.labels)
         elif self.mode == 'test':
             self.im_names = dataset
-            self.ims = [os.path.join('../input/test/test/0', im) for im in dataset]
+            self.ims = [os.path.join(test_path, im) for im in dataset]
         self.transform = transform
 
     def __getitem__(self, index):
