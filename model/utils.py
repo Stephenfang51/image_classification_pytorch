@@ -1,0 +1,36 @@
+from model import efficientNet, resnet
+from train_detail import train_detail
+import pretrainedmodels
+from torchvision import models
+from model.efficientNet import EfficientNet
+from model.resnet import Resnet18, Resnet50, Se_resnext50_32x4d
+
+# train_opt_2 = train_detail.parse()
+# Network_name = train_opt_2.model
+
+def select_network(network, num_classes = 1000):
+
+
+    if network == 'resnet18':
+        backbone = models.resnet18(pretrained=True)
+        model = Resnet18(backbone, num_classes=num_classes)
+        return model
+    #         metric_fc = ArcMarginProduct(512, Num_classes, s=30, m=0.5, easy_margin=False)
+    elif network == 'resnet50':
+        backbone = models.resnet50(pretrained=True)
+        model = Resnet50(backbone, num_classes=num_classes)
+        return model
+
+    elif network == 'se_resnext50_32x4d':
+        backbone = pretrainedmodels.se_resnext50_32x4d(pretrained='imagenet')
+        model = Se_resnext50_32x4d(backbone, num_classes=num_classes)
+        return model
+
+    elif network == 'efficientb0':
+        model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=num_classes)
+        return model
+
+    elif network == 'efficientb5':
+        model = EfficientNet.from_pretrained('efficientnet-b5', num_classes=num_classes)
+        return model
+    # return model
