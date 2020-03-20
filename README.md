@@ -1,6 +1,12 @@
 # image_classification
 
+>update 2020.3.20
 
+1. dataset.py 修改 (待测试randomErasing)
+2. train.py修改（新增efficientNet, 增加steplr scheduler)
+3. train_detail.py (增加steplr scheduler)
+4. 新增models/utils.py (select_networks)
+5. 修改utils.py (新增select_scheduler, opcounter)
 
 
 >update 2020.3.16
