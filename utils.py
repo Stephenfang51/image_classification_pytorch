@@ -156,3 +156,32 @@ class GradualWarmupScheduler(_LRScheduler):
         else:
             self.step_ReduceLROnPlateau(metrics, epoch)
 
+
+def select_sehcduler(lr_name, optimizer=None, Step_size = None , Multiplier=None, Total_epoch=None):
+    if lr_name == 'warmup':
+        scheduler_cosine = t.optim.lr_scheduler.CosineAnnealingLR(optimizer, Num_epochs)
+        scheduler = GradualWarmupScheduler(optimizer, multiplier=Multiplier, total_epoch=Total_epoch,
+                                           after_scheduler=scheduler_cosine)
+        return scheduler
+
+    elif lr_name == 'steplr':
+        scheduler = t.optim.lr_scheduler.StepLR(optimizer, step_size=Step_size, gamma=0.1)
+
+        return scheduler
+
+    # return scheduler
+
+
+
+def opcounter(model):
+
+    from thop import profile
+    input = t.randn(1, 3, 224, 224)
+    macs, params = profile(model, inputs=(input, ))
+
+    params = str(params)
+    prarms = params[:2] + 'M'
+
+    print('total macs : %d' % macs)
+    print('total params : {}'.format(params))
+

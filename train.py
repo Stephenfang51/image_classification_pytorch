@@ -4,24 +4,19 @@ import random
 import time
 import matplotlib.pyplot as plt
 from dataset import CDCDataset
-import torch.utils
 import torch as t
 from torchvision import transforms
 from loss import Focalloss, LabelSmoothSoftmaxCE
-import train_detail
 from torchvision import models
 from torch.utils.data import DataLoader
 from train_detail import train_detail
 
 import torch.nn as nn
-from models import Resnet18, Se_resnext50_32x4d
-from utils import accuracy, GradualWarmupScheduler
+# from model.resnet import Resnet18, Se_resnext50_32x4d
+# from model.efficientNet import EfficientNet
+from utils import accuracy, GradualWarmupScheduler, select_sehcduler, opcounter
+from model.utils import select_network
 
-import pretrainedmodels
-
-# parser = argparse.ArgumentParser()
-
-# parser.add_argument('--train_path', type=str, help='train dataset path')
 
 train_opt = train_detail().parse()
 
@@ -37,30 +32,50 @@ Num_epochs = train_opt.num_epochs
 Batch_size = train_opt.batch_size
 Freeze = train_opt.freeze
 Init_lr = train_opt.init_lr
+
+# Lr scheduler setting
+Lr_scheduler = train_opt.lr_scheduler
+Step_size = train_opt.step_size
+
+#Grad_Warm setting
 Multiplier = train_opt.multiplier
 Total_epoch = train_opt.total_epoch
-Grad_warm = train_opt.warm_up
+# Grad_warm = train_opt.warm_up
 
 
 #focal loss
 Alpha = train_opt.alpha
 Gamma = train_opt.gamma
 
+
+
+
+
+
+
 def train():
     # -------计算时间----------#
     begin_time = time.time()
 
     # ------确认Model---------#
-    if Model == 'resnet18':
-        #         backbone = torchvision.models.resnet18(pretrained=True)
-        backbone = models.resnet18(pretrained=True)
-        model = Resnet18(backbone, num_classes=Num_classes)
-    #         metric_fc = ArcMarginProduct(512, Num_classes, s=30, m=0.5, easy_margin=False)
-    elif Model == 'se_resnext50_32x4d':
-        backbone = pretrainedmodels.se_resnext50_32x4d(pretrained='imagenet')
-        model = Se_resnext50_32x4d(backbone, 5)
-    #         metric_fc = ArcMarginProduct(1024, Num_classes, s=30, m=0.5, easy_margin=False)
+    model = select_network(Model, Num_classes)
+    # if Model == 'resnet18':
+    #     #         backbone = torchvision.models.resnet18(pretrained=True)
+    #     backbone = models.resnet18(pretrained=True)
+    #     model = Resnet18(backbone, num_classes=Num_classes)
+    # #         metric_fc = ArcMarginProduct(512, Num_classes, s=30, m=0.5, easy_margin=False)
+    # elif Model == 'se_resnext50_32x4d':
+    #     backbone = pretrainedmodels.se_resnext50_32x4d(pretrained='imagenet')
+    #     model = Se_resnext50_32x4d(backbone, 5)
+    #
+    # elif Model == 'efficientb0':
+    #     model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=Num_classes)
+    #
+    # elif Model == 'efficientb5':
+    #     model = EfficientNet.from_pretrained('efficientnet-b5', num_classes=Num_classes)
+    # metric_fc = ArcMarginProduct(1024, Num_classes, s=30, m=0.5, easy_margin=False)
     # -----加载model 到gpu------#
+    opcounter(model)
     model.cuda()
     #     metric_fc.cuda()
 
@@ -89,7 +104,7 @@ def train():
     # ------ pytorch Dataloader for trai------#
     dataloader_train = DataLoader(dst_train, batch_size=Batch_size // 2, shuffle=True, num_workers=8)
 
-    # -------load checkpoint -------------#
+    # -------load checkpoints -------------#
     if Resume:
         model = t.load(os.path.join('./checkpoints/{}.pth'.format(Checkpoint)))
 
@@ -111,16 +126,10 @@ def train():
     optimizer = t.optim.Adam([{'params': filter(lambda p: p.requires_grad, model.parameters())},
                               #                                   {'params':metric_fc.parameters()}
                               ], lr=Init_lr, betas=(0.9, 0.999), weight_decay=0.002)
+
     # --------scheduler ------------------#
 
-    if Grad_warm:
-        scheduler_cosine = t.optim.lr_scheduler.CosineAnnealingLR(optimizer, Num_epochs)
-        scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=Multiplier, total_epoch=Total_epoch,
-                                              after_scheduler=scheduler_cosine)
-
-
-
-
+    sehcduler = select_sehcduler(Lr_scheduler, optimizer, Step_size, Multiplier, Total_epoch)
 
     print('Start training')
     # ------ list for plot curve ----------#
@@ -130,8 +139,7 @@ def train():
     lr_list = []
     # -------- train --------------------#
     for epoch in range(Num_epochs):
-        if Grad_warm:
-            scheduler_warmup.step()
+        sehcduler.step()
 
         ep_start = time.time()
         model.train()
@@ -196,8 +204,6 @@ def train():
 
 
 if __name__ == '__main__':
-
-
 
 
     # args = parser.parse_args()
