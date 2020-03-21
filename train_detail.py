@@ -37,6 +37,8 @@ class train_detail():
         self._parser.add_argument('--total_epoch', type=int, default = '20', help='?')
         self._parser.add_argument('--alpha', type=float, default = '0.2', help='focal loss')
         self._parser.add_argument('--gamma', type=int, default = '5', help='focal loss')
+        #--- data aug ----#
+        self._parser.add_argument('--re', type=str2bool, default=False, help='use of RandomErasing')
         # self._parser.add_argument('--warm_up', type=str2bool, default = True, help='if warm up lr at first training')
 
     def parse(self):

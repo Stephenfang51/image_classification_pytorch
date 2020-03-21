@@ -15,7 +15,7 @@ import torch.nn as nn
 # from model.resnet import Resnet18, Se_resnext50_32x4d
 # from model.efficientNet import EfficientNet
 from utils import accuracy, GradualWarmupScheduler, select_sehcduler, opcounter
-from model.utils import select_network
+from model.utils import select_network, freeze_param
 
 
 train_opt = train_detail().parse()
@@ -25,7 +25,7 @@ train_path = train_opt.train_path
 Num_classes = train_opt.num_classes
 Size = train_opt.input_size
 Model = train_opt.model
-Checkpoint = train_opt.checkpoint
+Checkpoint = train_opt.checkpoints
 Resume = train_opt.resume
 Loss = train_opt.loss
 Num_epochs = train_opt.num_epochs
@@ -48,6 +48,10 @@ Alpha = train_opt.alpha
 Gamma = train_opt.gamma
 
 
+#data aug
+Re = train_opt.re
+
+
 
 
 
@@ -59,37 +63,17 @@ def train():
 
     # ------确认Model---------#
     model = select_network(Model, Num_classes)
-    # if Model == 'resnet18':
-    #     #         backbone = torchvision.models.resnet18(pretrained=True)
-    #     backbone = models.resnet18(pretrained=True)
-    #     model = Resnet18(backbone, num_classes=Num_classes)
-    # #         metric_fc = ArcMarginProduct(512, Num_classes, s=30, m=0.5, easy_margin=False)
-    # elif Model == 'se_resnext50_32x4d':
-    #     backbone = pretrainedmodels.se_resnext50_32x4d(pretrained='imagenet')
-    #     model = Se_resnext50_32x4d(backbone, 5)
-    #
-    # elif Model == 'efficientb0':
-    #     model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=Num_classes)
-    #
-    # elif Model == 'efficientb5':
-    #     model = EfficientNet.from_pretrained('efficientnet-b5', num_classes=Num_classes)
-    # metric_fc = ArcMarginProduct(1024, Num_classes, s=30, m=0.5, easy_margin=False)
-    # -----加载model 到gpu------#
+
     opcounter(model)
     model.cuda()
     #     metric_fc.cuda()
 
     # freeze layers
     if Freeze:
-        print('freeze the grad of layer0~layer3 now !')
-        if Model == 'se_resnext50_32x4d':
-            for p in model.backbone.layer0.parameters(): p.requires_grad = False
-        for p in model.backbone.layer1.parameters(): p.requires_grad = False
-        for p in model.backbone.layer2.parameters(): p.requires_grad = False
-        for p in model.backbone.layer3.parameters(): p.requires_grad = False
-    #         for p in model.backbone.layer4.parameters(): p.requires_grad = False
+        model = freeze_param(Model, model)
+
     # ------train dataset trasforms----#
-    train_transform = transforms.Compose([transforms.Scale(256),
+    train_transform = transforms.Compose([transforms.Resize(256),
                                           transforms.RandomResizedCrop(224),
                                           transforms.RandomHorizontalFlip(),
                                           transforms.RandomVerticalFlip(),
@@ -100,7 +84,7 @@ def train():
                                           transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                                std=[0.229, 0.224, 0.225])])
     # ------ train CDC ------#
-    dst_train = CDCDataset(ims2labels, transform=train_transform)
+    dst_train = CDCDataset(ims2labels, transform=train_transform, re = Re)
     # ------ pytorch Dataloader for trai------#
     dataloader_train = DataLoader(dst_train, batch_size=Batch_size // 2, shuffle=True, num_workers=8)
 
@@ -129,7 +113,7 @@ def train():
 
     # --------scheduler ------------------#
 
-    sehcduler = select_sehcduler(Lr_scheduler, optimizer, Step_size, Multiplier, Total_epoch)
+    sehcduler = select_sehcduler(Lr_scheduler, optimizer, Step_size, Multiplier, Total_epoch, Num_epochs)
 
     print('Start training')
     # ------ list for plot curve ----------#

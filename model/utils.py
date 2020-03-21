@@ -34,3 +34,49 @@ def select_network(network, num_classes = 1000):
         model = EfficientNet.from_pretrained('efficientnet-b5', num_classes=num_classes)
         return model
     # return model
+
+
+
+def freeze_param(network, model):
+    if network == 'resnet18':
+        for p in model.backbone.layer0.parameters(): p.requires_grad = False
+        for p in model.backbone.layer1.parameters(): p.requires_grad = False
+        for p in model.backbone.layer2.parameters(): p.requires_grad = False
+        for p in model.backbone.layer3.parameters(): p.requires_grad = False
+
+        return model
+
+    elif network == 'resnet50':
+        for p in model.backbone.layer0.parameters(): p.requires_grad = False
+        for p in model.backbone.layer1.parameters(): p.requires_grad = False
+        for p in model.backbone.layer2.parameters(): p.requires_grad = False
+        for p in model.backbone.layer3.parameters(): p.requires_grad = False
+
+        return model
+
+    elif network == 'se_resnext50_32x4d':
+
+        for p in model.backbone.layer0.parameters(): p.requires_grad = False
+        for p in model.backbone.layer1.parameters(): p.requires_grad = False
+        for p in model.backbone.layer2.parameters(): p.requires_grad = False
+        for p in model.backbone.layer3.parameters(): p.requires_grad = False
+
+        return model
+
+
+    elif network == 'efficientb0':
+        for p in model.parameters():
+            p.requires_grad = False
+        model._fc.weight.requires_grad = True
+        model._fc.bias.requires_grad = True
+
+        return model
+
+
+    elif network == 'efficientb5':
+        for p in model.parameters():
+            p.requires_grad = False
+        model._fc.weight.requires_grad = True
+        model._fc.bias.requires_grad = True
+
+        return model

@@ -1,11 +1,12 @@
 import os
 from torch.utils.data import Dataset
 from PIL import Image
+from data_aug import RandomErasing
 
 
 
 class CDCDataset(Dataset):
-    def __init__(self, dataset, transform=None, mode='train', test_path = None, tta=False, idx=0):
+    def __init__(self, dataset, transform=None, mode='train', test_path = None, tta=False, idx=0, re = None):
         self.tta=tta
         self.idx = idx
         self.mode = mode
@@ -19,6 +20,7 @@ class CDCDataset(Dataset):
             self.im_names = dataset
             self.ims = [os.path.join(test_path, im) for im in dataset]
         self.transform = transform
+        self.re = re
 
     def __getitem__(self, index):
         im_path = self.ims[index]
@@ -27,11 +29,17 @@ class CDCDataset(Dataset):
         elif self.mode == 'test':
             im_name = self.im_names[index]
         im = Image.open(im_path)
+        #--------分成train/val 和 test来处理
         if self.mode == 'train' or self.mode == 'val':
-            if self.transform is not None:
-#                 im = RandomErasing(im, probability = 0.5, sl = 0.02, sh = 0.4, r1 = 0.3, mean=[128, 128, 128])
+            if self.transform is not None and self.re:
+                print('data transform : RE+tsf')
+                im = RandomErasing(im)
                 im = self.transform(im)
-            return im, label
+                return im, label
+            elif self.transform:
+                print('data transform : tsf')
+                im = self.transform(im)
+                return im, label
         elif self.mode == 'test':
             if self.tta:
                 w, h = im.size
