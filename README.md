@@ -1,4 +1,10 @@
 # image_classification
+> update 2020.3.21
+
+1. 改一下train.py (freeze的部分)
+2. 将freeze_param添加到model/utils.py底下
+3. data_aug 修正 RandomErasing , 所以dataset.py也修正
+4. train.py / train_detail.py 也修正
 
 >update 2020.3.20
 
