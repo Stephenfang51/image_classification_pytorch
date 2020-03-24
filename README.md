@@ -1,4 +1,63 @@
-# image_classification
+# Image_classification_Pytorch
+本来是自己写来比赛用， 方便调参的图像分类框架, 一个挺方便分类框架， 还在慢慢完善各种模型
+
+目前包含
+
+- resnet18
+- resnet50
+- se_resnext50
+- efficientNetB0
+- efficientNetB5
+
+
+
+#### install
+
+```shell
+git clone https://github.com/Stephenfang51/image_classification_pytorch
+```
+
+
+
+#### requirement
+
+1. torch 版本必须 >= 1.1 而且必须从 pip3 install https://download.pytorch.org/whl/cu100/torch-1.1.0-cp36-cp36m-linux_x86_64.whl 这样安装 cuda才会是10.0
+
+2. `pip install pretrainedmodels`
+
+
+
+#### train data
+
+1. Preparing your train data like 
+
+   ```
+   # if you have 3 classes in total, they are class A, class B, class C
+   # your train will be like below
+   
+   train/A/
+   train/B/
+   train/C/
+   ```
+
+2. if your training image all in one dir, you can use [csv_data_classification.ipynb](https://github.com/Stephenfang51/image_classification_pytorch/blob/master/csv_data_classification.ipynb) to move your original imgs to its independant dir according to your csv file
+
+#### How to train
+
+you can directly command like below to train, select your model, input_size, num_classes …etc
+
+```shell
+python train.py --train_path /input/mango/train_3levels/ --model efficientb5 --input_size 224 --num_classes 3 --lr_scheduler steplr --step_size 20 --batch_size 32 --init_lr 0.001 --freeze True
+```
+
+
+
+To see all the command param, you can check [train_detail.py](https://github.com/Stephenfang51/image_classification_pytorch/blob/master/train_detail.py)
+
+
+
+#### Update
+
 > update 2020.3.21
 
 1. 改一下train.py (freeze的部分)
