@@ -123,7 +123,7 @@ def train():
     lr_list = []
     # -------- train --------------------#
     for epoch in range(Num_epochs):
-        sehcduler.step()
+
 
         ep_start = time.time()
         model.train()
@@ -141,6 +141,7 @@ def train():
             loss.backward()
             optimizer.step()
 
+
             top1 = accuracy(output.data, target.data, topk=(1,))
             train_loss_sum += loss.data.cpu().numpy()
             train_top1_sum += top1[0]
@@ -154,10 +155,11 @@ def train():
         train_loss_list.append(train_loss_sum / sum)
         train_top1_list.append(train_top1_sum / sum)
         lr_list.append(lr)
-
+        sehcduler.step()
         sum = 0
         train_loss_sum = 0
         train_top1_sum = 0
+
         # -----------以上归零-------------------#
         if (epoch + 1) % 50 == 0 and epoch < Num_epochs or (epoch + 1) == Num_epochs:
             t.save(model, './checkpoints/{}.pth'.format(Checkpoint))
