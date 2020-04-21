@@ -3,11 +3,13 @@
 
 目前包含
 
-- resnet18
-- resnet50
-- se_resnext50
-- efficientNetB0
-- efficientNetB5
+- Resnet18
+- Resnet50
+- Se_resnext50
+- EfficientNetB0
+- EfficientNetB5
+- Resnest50
+- Resnest101
 
 
 
@@ -50,13 +52,23 @@ you can directly command like below to train, select your model, input_size, num
 python train.py --train_path /input/mango/train_3levels/ --model efficientb5 --input_size 224 --num_classes 3 --lr_scheduler steplr --step_size 20 --batch_size 32 --init_lr 0.001 --freeze True
 ```
 
-
-
 To see all the command param, you can check [train_detail.py](https://github.com/Stephenfang51/image_classification_pytorch/blob/master/train_detail.py)
 
 
 
 #### Update
+
+>update 2020.4.21
+
+1. 新增ResNest50, ResNest101
+
+   - model/utils.py  freeze_param, select_network添加ResNest50, ResNest101
+
+   - Train_detail —model 添加ResNest50, ResNest101
+
+2. utils.py 下opcounter 修复格式
+
+   
 
 > update 2020.3.21
 
