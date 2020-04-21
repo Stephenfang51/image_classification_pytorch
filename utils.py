@@ -4,6 +4,7 @@ import numpy as np
 from torchvision import transforms
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from .thop import clever_format
 
 
 def mkdir(path):
@@ -157,7 +158,7 @@ class GradualWarmupScheduler(_LRScheduler):
             self.step_ReduceLROnPlateau(metrics, epoch)
 
 
-def select_sehcduler(lr_name, optimizer=None, Step_size = None , Multiplier=None, Total_epoch=None):
+def select_sehcduler(lr_name, optimizer=None, Step_size = None , Multiplier=None, Total_epoch=None, Num_epochs=None):
     if lr_name == 'warmup':
         scheduler_cosine = t.optim.lr_scheduler.CosineAnnealingLR(optimizer, Num_epochs)
         scheduler = GradualWarmupScheduler(optimizer, multiplier=Multiplier, total_epoch=Total_epoch,
@@ -177,11 +178,9 @@ def opcounter(model):
 
     from thop import profile
     input = t.randn(1, 3, 224, 224)
-    macs, params = profile(model, inputs=(input, ))
+    flops, params = profile(model, inputs=(input, ))
+    macs, params = clever_format([flops, params], "%.3f")
 
-    params = str(params)
-    prarms = params[:2] + 'M'
-
-    print('total macs : %d' % macs)
+    print('total macs : {} '.format(macs))
     print('total params : {}'.format(params))
 
