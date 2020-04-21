@@ -21,7 +21,7 @@ class train_detail():
         self._parser = argparse.ArgumentParser()
 
         self._parser.add_argument('--train_path', type=str, help='train dataset path')
-        self._parser.add_argument('--model', type=str, help='se_resnext50_32x4d || resnet18 || efficientb0 || efficientb5')
+        self._parser.add_argument('--model', type=str, help='se_resnext50_32x4d || resnet18 || efficientb0 || efficientb5 || resnest50 || resnest101')
         self._parser.add_argument('--checkpoints', type=str,  default='result_model', help='your checkpoints model name')
         self._parser.add_argument('--loss', type=str, default = 'CrossEntropy', help='FocalLoss || CrossEntropy || LabelSmoothSoftmaxCE')
         self._parser.add_argument('--freeze', type=str2bool, default = False, help='freeze backbone params')
@@ -31,8 +31,8 @@ class train_detail():
         self._parser.add_argument('--batch_size', type=int, default = '256', help='batch to put in')
         self._parser.add_argument('--num_epochs', type=int, default = '600', help='total epochs to train')
         self._parser.add_argument('--init_lr', type=float, default = '0.0001', help='learning rate at first')
-        self._parser.add_argument('--lr_scheduler', type=str, help ='steplr || warmup')
-        self._parser.add_argument('--step_size', type=int, default = '20', help='for lr_StepLR')
+        self._parser.add_argument('--lr_scheduler', type=str, help ='steplr || warmup') #TODO 新增fixed lr
+        self._parser.add_argument('--step_size', type=int, default = '20', help='step size betweeen next adjustion')
         self._parser.add_argument('--multiplier', type=int, default = '80', help='?')
         self._parser.add_argument('--total_epoch', type=int, default = '20', help='?')
         self._parser.add_argument('--alpha', type=float, default = '0.2', help='focal loss')
