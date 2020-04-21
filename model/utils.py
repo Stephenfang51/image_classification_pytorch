@@ -4,6 +4,7 @@ import pretrainedmodels
 from torchvision import models
 from model.efficientNet import EfficientNet
 from model.resnet import Resnet18, Resnet50, Se_resnext50_32x4d
+from model.resnest import *
 
 # train_opt_2 = train_detail.parse()
 # Network_name = train_opt_2.model
@@ -26,6 +27,17 @@ def select_network(network, num_classes = 1000):
         model = Se_resnext50_32x4d(backbone, num_classes=num_classes)
         return model
 
+    elif network == 'resnest50':
+        model = resnest50(pretrained = True, num_classes=num_classes)
+        # model = resnest50(num_classes=num_classes)
+        return model
+
+    elif network == 'resnest101':
+        model = resnest101(pretrained = True, num_classes=num_classes)
+        # model = resnest101(num_classes=num_classes)
+        return model
+
+
     elif network == 'efficientb0':
         model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=num_classes)
         return model
@@ -33,6 +45,8 @@ def select_network(network, num_classes = 1000):
     elif network == 'efficientb5':
         model = EfficientNet.from_pretrained('efficientnet-b5', num_classes=num_classes)
         return model
+
+
     # return model
 
 
@@ -62,6 +76,23 @@ def freeze_param(network, model):
         for p in model.backbone.layer3.parameters(): p.requires_grad = False
 
         return model
+
+    elif network == 'resnest50':
+        for p in model.layer1.parameters(): p.requires_grad = False
+        for p in model.layer2.parameters(): p.requires_grad = False
+        for p in model.layer3.parameters(): p.requires_grad = False
+        for p in model.layer4.parameters(): p.requires_grad = False
+
+        return model
+
+    elif network == 'resnest101':
+        for p in model.layer1.parameters(): p.requires_grad = False
+        for p in model.layer2.parameters(): p.requires_grad = False
+        for p in model.layer3.parameters(): p.requires_grad = False
+        for p in model.layer4.parameters(): p.requires_grad = False
+
+        return model
+
 
 
     elif network == 'efficientb0':
