@@ -1,0 +1,22 @@
+fold_num: 5
+seed: 719
+model_arch: resnet50
+img_size: 224 
+epochs: 100
+loss: labelsmooth  #BCEwithlogits, labelsmooth, c
+train_batchsize: 256
+valid_batchsize: 128
+test_batchsize: 128 #for test tt
+T_0: 10  #for cosine lr schedule
+lr: 0.001
+min_lr: 0.00001
+weight_decay: 0.00001
+num_workers: 4
+accum_iter: 2 # suppoprt to do batch accumulation for backprop with effectively larger batch siz
+verbose_step: 1
+tta : 3
+valid_every_x_epoch: 5
+default_save_path: output_model
+gpus : 0
+# 'model_arch': "tf_efficientnet_b4_ns"
+# 'model_arch': 'RepVGG-B1g2'
