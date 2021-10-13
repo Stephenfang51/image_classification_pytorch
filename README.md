@@ -1,6 +1,9 @@
 #### Update
 
 
+2021.10.13
+1. reconstruct whole code structure
+
 
 2021.2.6
 
@@ -33,98 +36,99 @@
 
 2020.12.29
 
-1. ResNet models
-2. ResNest models
+1. ResNet all models
+2. ResNest all models
 3. efficientNet B4
 
 ---
 
-### How to train
+## How to train
 
-edit **config.py** to change hyper-parameters 
-
-`weights_path` is to save the best weights
-
-`experiment_dir` is to save tensorboard log
-
-`class_num` : class number
-
+### 1. data prepare
+1. set you image data be like :
 ```
-CFG = {
-    'fold_num': 5,
-    'seed': 719,
-    'model_arch': 'tf_efficientnet_b4_ns',
-    'img_size': 224,
-    'epochs': 100,
-    'train_batchsize': 32,
-    'valid_batchsize': 128,
-    'T_0': 10,  #for cosine lr scheduler
-    'lr': 1e-3,
-    'min_lr': 1e-6,
-    'weight_decay':1e-6,
-    'num_workers': 4,
-    'accum_iter': 2, # suppoprt to do batch accumulation for backprop with effectively larger batch size
-    'verbose_step': 1,
-    'device': 'cuda:0',
-    'weights_path' : 'weights/efficientb4_bs32_sgd',
-    'experiment_dir': 'runs/efficientb4_sgd/',
-    'class_num' : 3
+data
+  | --- task_name
+            |---train
+                  |---class1
+                        |---- img1.jpg
+                        |---- img2.jpg
+                        |---- ....
+                  |---class2
+                  |---...
+                    
+            |--- val
+                  |---class1
+                        |---- img1.jpg
+                        |---- img2.jpg
+                        |---- ....
+                  |---class2
+                  |---...
+```
 
-}
+2.using data_load/img2csv.py to create train and val csv file
+```shell
+#create train csv
+python data_load/img2csv.py --img_path data/your_task_name/train/ --classes class1,class2... --csv data/your_task_name_train.csv
+#create vaL csv
+python data_load/img2csv.py --img_path data/your_task_name/ --classes class1,class2... --csv data/your_task_name_val.csv
 ```
 
 
+### 2. start training
 
+you can copy a default cfg to modify it in experiments dir:
 
+config.yaml
+```
+fold_num: 5
+seed: 719
+model_arch: resnet50
+img_size: 224 
+epochs: 100
+loss: labelsmooth  #BCEwithlogits, labelsmooth, c
+train_batchsize: 256
+valid_batchsize: 128
+test_batchsize: 128 #for test tt
+T_0: 10  #for cosine lr schedule
+lr: 0.001
+min_lr: 0.00001
+weight_decay: 0.00001
+num_workers: 4
+accum_iter: 2 # suppoprt to do batch accumulation for backprop with effectively larger batch siz
+verbose_step: 1
+tta : 3
+valid_every_x_epoch: 5
+default_save_path: output_model
+gpus : 0
+# 'model_arch': "tf_efficientnet_b4_ns"
+# 'model_arch': 'RepVGG-B1g2'
+```
 
-and you can decide not to using pretrained model in `train.py`, under train function
+train commnad example
+```shell
+python train.py --tpath data/yourtask/train/ --tcsv data/yourtask_train.csv --vpath data/yourtask/val/ --vcsv data/yourtask_val.csv --cfg experiment/config_task.yaml --bsize 128 --gpus '0,1,2,3,4,5,6,7'
+```
+- `-bsize` : training-batchsize
+- `-cfg` : your config yaml
+- `-gpus` : set gpu be like '0,1,2,3' ps.start from 0
 
-and finally just `python train.py --img_path /path/to/data/ --csv /path/to/xxx.csv`
+### 3. after training
+1. training confusion matrix 
+2. trained weight
+3. tensorboard log
 
-
-
-#### train with different validation
-
-use `train_.py`
-
-should specifiy `valid_img_path`, `valid_csv` as arguments
+above will be save into output_model directory by date_modelname
 
 ---
 
-#### Inference 
+### Inference 
 
-#### test img one by one
-
-create a dir containing a list of imgs
-
-and using `test.py` 
-
-e.g.
-
-`python test.py --img_path /path/to/inference --save_path /path/to/saveresult --model 'enteryour model_arch --num_class 'enter your num of class' --weights enter your checkpoint path`
-
-and predicted class will be draw on output imgs
-
-#### test img with TTA (test-time augmentation)
-
-using `test_tta.py`
-
-specify your 
-
-1. pretrained model 
-2. test data path 
-3. csv
-
+not yet update
 
 
 ---
 
 #### ScoreCam
 
-edit `ScoreCam.py` 
-
-```python
-ori_img = Image.open('photo/smoking.jpg').convert('RGB')
-```
-
-and run on pycharm to directly show image using matplotlib
+not yet update
