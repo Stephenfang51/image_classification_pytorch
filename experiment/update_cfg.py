@@ -42,7 +42,7 @@ def create_dir(dict_cfg):
         os.makedirs("{}/{}_{}/{}".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"], 1))
         with open("{}/{}_{}/1/training_config.yaml".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"]), "w") as file:
             config_log = yaml.dump(dict_cfg, file)
-        save_path = "{}/{}_{}".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"])
+        save_path = "{}/{}_{}/1".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"])
     else:
         max_num = max([int(directory) for directory in os.listdir("{}/{}_{}".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"]))]) + 1
         os.makedirs("{}/{}_{}/{}".format(dict_cfg["default_save_path"], date_format, dict_cfg["model_arch"], max_num), exist_ok=True)
