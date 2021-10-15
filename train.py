@@ -52,8 +52,8 @@ def train_every_epoch(epoch, model, loss_fn, optimizer, train_dataloader, device
             optimizer.step()
             optimizer.zero_grad()
 
-            if scheduler != None and schd_batch_update:
-                scheduler.step()
+            # if scheduler != None and schd_batch_update:
+            #     scheduler.step()
 
 
         if ((step + 1) % CFG['verbose_step'] == 0) or((step + 1) == len(train_dataloader)):
@@ -137,7 +137,8 @@ def train(train_csv, valid_csv, data_root_train, data_root_valid, classifier, da
     #optimizer and scheduler
     # optimizer = torch.optim.Adam(model.parameters(), lr=CFG['lr'], weight_decay=CFG['weight_decay'])
     optimizer = torch.optim.SGD(model.parameters(), lr=CFG['lr'], momentum=0.9)
-    #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=CFG['T_0'], T_mult=1, eta_min=CFG['min_lr'], last_epoch=-1)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=CFG['T_0'], T_mult=1, eta_min=CFG['min_lr'], last_epoch=-1)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [20, 40, 60], gamma=0.1)
 
 
     if CFG['loss'] == 'labelsmoothCE':
@@ -152,7 +153,7 @@ def train(train_csv, valid_csv, data_root_train, data_root_valid, classifier, da
     #train and valid
     best_acc = 0;
     for epoch in range(CFG['epochs']):
-        loss = train_every_epoch(epoch, model, loss_train, optimizer, train_dataloader, device, scheduler=None, schd_batch_update=False)
+        loss = train_every_epoch(epoch, model, loss_train, optimizer, train_dataloader, device, scheduler=scheduler, schd_batch_update=False)
         writer.add_scalar('loss', loss, epoch, time.time())
 
         if (epoch+1) % CFG['valid_every_x_epoch'] == 0:
@@ -184,8 +185,10 @@ if __name__ == "__main__":
     parser.add_argument('--valid_csv', '--vcsv', type=str, required=True, help='valid csv file to load')
     parser.add_argument('--config', '--cfg', type=str, required=True, help="set your training config path")
     parser.add_argument('--cal_mtx', type=bool, default=True, help="whether to calculate fusion matrix")
-    parser.add_argument('--gpus', type=str, default='6, 7', help="which gpus to train on, default is '6, 7' ")
-    parser.add_argument('--batch_size', '--bsize', type=int, default=64, help="set batchsize for every training iter")
+    parser.add_argument('--gpus', type=str, help="which gpus to train on, default is '6, 7' ")
+    parser.add_argument('--batch_size', '--bsize', type=int, help="set batchsize for every training iter")
+    parser.add_argument('--img_size', type=int, help="set img size for training model")
+    parser.add_argument('--epochs', '--epc', type=int, help="set total training epochs")
 
     args = parser.parse_args()
     print(args)
@@ -220,4 +223,5 @@ if __name__ == "__main__":
     train(train_csv, valid_csv, args.train_img_path, args.valid_img_path, classifier, dataset, device, save_path)
 
     writer.close()
+    
     

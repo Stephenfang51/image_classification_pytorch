@@ -1,5 +1,8 @@
 #### Update
 
+2021.10.15
+1. add transform setting in config.yaml
+2. add new arguments parser, and function update_cfg 
 
 2021.10.13
 1. reconstruct whole code structure

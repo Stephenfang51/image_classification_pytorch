@@ -9,7 +9,7 @@ and the output's column will be like 'index, id, class_name, label'
 python data_load/img2csv.py --img_path data/spc_smokingcalling_20210119/ --classes normal,normal2,normal3,smoking,calling,calling2 --csv data/spc_smokingcalling_20210119.csv
 python data_load/img2csv.py --img_path data/spc_smokingcalling_20210203_small_2/ --classes normal,normal2,normal3,smoking,calling,calling2 --csv data/spc_smokingcalling_20210203_2.csv
 python data_load/img2csv.py --img_path data/spc_smokingcalling_20210308_addnormal4_3/ --classes normal,normal2,normal3,normal4,smoking,calling,calling2,calling3,calling4 --csv data_inference/spc_smokingcalling_20210308_addnormal4_3.csv
-
+python data_load/img2csv.py --img_path data/goggles_classification/val/ --classes w_goggles,wo_goggles --csv data/goggles_classification_val.csv 
 """
 
 """---options---"""

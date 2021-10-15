@@ -20,15 +20,23 @@ def update_cfg(args):
         dict_yaml = yaml.safe_load(file)
         #check if batchsize changed through arg parser
         if args.batch_size is not None:
-            print(f'updating batch_size to {args.batch_size}')
             assert 16 < args.batch_size < 512, "please set batchsize range from 0 to 256 !"
+            print(f'updating batch_size to {args.batch_size}')
             dict_yaml['train_batchsize'] = args.batch_size
         if args.gpus is not None:
-            print(f'updating gpus to {args.gpus}')
             device_num = device_count()
             assert 1 < int(args.gpus[-1])+1 <= device_num, f"your system got {device_num} GPUS, now you set {int(args.gpus[-1])+1}!"
+            print(f'updating gpus to {args.gpus}')
             dict_yaml['gpus'] = args.gpus
-
+        if args.img_size is not None:
+            assert (args.img_size % 32 == 0), "img size cannot divide by 32, should be like 32, 64, 112, 224..etc"
+            print((f'updating img-size to {args.img_size}'))
+            dict_yaml['img_size'] = args.img_size
+        if args.epochs is not None:
+            assert (args.epochs > 0), "trianing epocsh cannot be set to zero"
+            print((f'updating epochs to {args.epochs}'))
+            dict_yaml['epochs'] = args.epochs
+    print('*'*50)
     [print(key, value) for key, value in dict_yaml.items()]
 
     return dict_yaml

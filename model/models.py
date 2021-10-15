@@ -67,11 +67,11 @@ def modified_classifier_output(cfg, model_fn, args):
     class_num = len(os.listdir(args.train_img_path))
 
     if cfg['model_arch'][0:6] == 'resnet' or cfg['model_arch'][0:7] == 'resnest':
-        return Classifier(model_fn, class_num, pretrained=True)
+        return Classifier(model_fn, class_num, pretrained=cfg['pretrained'])
     elif cfg['model_arch'][0:3] == 'Rep': #repvgg
-        return Classifier_repvgg(model_fn, class_num, pretrained=True)
+        return Classifier_repvgg(model_fn, class_num, cfg['pretrained'])
     elif cfg['model_arch'][0:2] == 'tf':
-        return Classifier_efficientnet(model_fn, class_num, pretrained=True)
+        return Classifier_efficientnet(model_fn, class_num, cfg['pretrained'])
 
 
 

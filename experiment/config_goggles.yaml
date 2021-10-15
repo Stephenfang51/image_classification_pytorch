@@ -1,22 +1,48 @@
 fold_num: 5
 seed: 719
-model_arch: resnet50
-img_size: 224 
-epochs: 100
+model_arch: resnet18
+pretrained : False #if True, use imagenet pretrianed
+img_size: 128
+epochs: 50
 loss: labelsmooth  #BCEwithlogits, labelsmooth, c
-train_batchsize: 256
+train_batchsize: 128
 valid_batchsize: 128
 test_batchsize: 128 #for test tt
 T_0: 10  #for cosine lr schedule
-lr: 0.001
+lr: 0.01
 min_lr: 0.00001
 weight_decay: 0.00001
 num_workers: 4
-accum_iter: 2 # suppoprt to do batch accumulation for backprop with effectively larger batch siz
+accum_iter: 1 # suppoprt to do batch accumulation for backprop with effectively larger batch siz
 verbose_step: 1
 tta : 3
 valid_every_x_epoch: 5
 default_save_path: output_model
-gpus : 0
+gpus : 0,1
 # 'model_arch': "tf_efficientnet_b4_ns"
 # 'model_arch': 'RepVGG-B1g2'
+
+#img augmentation
+train_aug:
+  HorizontalFlip : [0.5] #p
+  VerticalFlip : [0.5] #p
+  HueSaturationValue : [0.2, 0.2, 0.2, 0.5] #hue_shift_limit #sat_shift_limit #val_shift_limit
+  ShiftScaleRotate : [0.5] #p
+  CoarseDropout : [0.5] #p
+  Cutout : [0.5] #p
+  MotionBlur : [3, 0.5] #blur_limit #p
+val_aug:
+  HorizontalFlip : None
+  VerticalFlip : None
+  HueSaturationValue : None
+  ShiftScaleRotate : None
+  CoarseDropout : None
+  Cutout : None
+  MotionBlur : None
+tta_aug:
+  HorizontalFlip : None
+  VerticalFlip : None
+  HueSaturationValue : None
+  ShiftScaleRotate : None
+  CoarseDropout : [0.5]
+  Cutout : [0.5]
