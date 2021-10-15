@@ -1,4 +1,10 @@
-#### Update
+# Image Classification Tool
+---
+As a computer vision engineer, it was designed for my daily work
+
+This project will be updated occasionally.
+
+### Update
 
 2021.10.15
 1. add transform setting in config.yaml
@@ -83,6 +89,7 @@ python data_load/img2csv.py --img_path data/your_task_name/ --classes class1,cla
 you can copy a default cfg to modify it in experiments dir:
 
 config.yaml
+remember to set None if you do not want to any of img transforms
 ```
 fold_num: 5
 seed: 719
@@ -106,6 +113,31 @@ default_save_path: output_model
 gpus : 0
 # 'model_arch': "tf_efficientnet_b4_ns"
 # 'model_arch': 'RepVGG-B1g2'
+
+#img augmentation
+train_aug:
+  HorizontalFlip : [0.5]
+  VerticalFlip : [0.5]
+  HueSaturationValue : [0.2, 0.2, 0.2, 0.5]
+  ShiftScaleRotate : [0.5]
+  CoarseDropout : [0.5]
+  Cutout : [0.5]
+  MotionBlur : [3, 0.5]
+val_aug:
+  HorizontalFlip : None
+  VerticalFlip : None
+  HueSaturationValue : None
+  ShiftScaleRotate : None
+  CoarseDropout : [0.5]
+  Cutout : [0.5]
+tta_aug:
+  HorizontalFlip : None
+  VerticalFlip : None
+  HueSaturationValue : None
+  ShiftScaleRotate : None
+  CoarseDropout : [0.5]
+  Cutout : [0.5]
+
 ```
 
 train commnad example
